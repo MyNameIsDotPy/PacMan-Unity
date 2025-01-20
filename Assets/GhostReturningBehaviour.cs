@@ -17,9 +17,10 @@ public class GhostReturningBehaviour : StateMachineBehaviour
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (animator.transform.position == _ghostMovement.checkpoints[_nearestCheckpoint].transform.position)
+        if (Vector3.Distance(animator.transform.position, _ghostMovement.checkpoints[_nearestCheckpoint].transform.position) < 0.1f)
         {
             animator.SetTrigger("haveReturned");
+            return;
         }
 
         _ghostMovement.FollowPath();

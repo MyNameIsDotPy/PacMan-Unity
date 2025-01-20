@@ -54,10 +54,7 @@ public class GhostMovement : MonoBehaviour
     public void SetCheckpoint(int newIndex)
     {
         _currentCheckpoint = newIndex;
-        _initialPosition = checkpoints[_currentCheckpoint].position;
-        _finalPosition = _initialPosition;
-        _dir = checkpoints[(_currentCheckpoint + 1)%checkpoints.Length].position - transform.position;
-        _dir.Normalize();
+        _t = 0;
     }
 
     public int GetNearestCheckpoint()
@@ -106,30 +103,17 @@ public class GhostMovement : MonoBehaviour
             _t = Mathf.Clamp(_t, 0, 1);
             gameObject.transform.position = Vector3.Lerp(_initialPosition, _finalPosition, _t);
         }
-        
     }
 
     public void FollowCheckpoints()
     {
-        if (_t >= 1)
+        
+        if (Vector3.Distance(transform.position, checkpoints[_currentCheckpoint].position) < 0.05f)
         {
-            _t = 0;
-            _initialPosition = gameObject.transform.position;
-            
-            if (Vector3.Distance(transform.position, checkpoints[_currentCheckpoint].position) < 0.1f)
-            {
-                _dir = checkpoints[(_currentCheckpoint + 1)%checkpoints.Length].position - transform.position;
-                _dir.Normalize();
-                _currentCheckpoint = (_currentCheckpoint + 1)%checkpoints.Length;
-            }
-            
-            _finalPosition = _initialPosition + _dir;
+            _currentCheckpoint = (_currentCheckpoint + 1)%checkpoints.Length;
+            CalculatePathToCheckpoint(_currentCheckpoint);
         }
-        Debug.DrawRay(transform.position, _dir, Color.red);
-
-        _t += Time.deltaTime * moveSpeed;
-        _t = Mathf.Clamp(_t, 0, 1);
-        gameObject.transform.position = Vector3.Lerp(_initialPosition, _finalPosition, _t);
+        FollowPath();
     }
 
     private void OnDrawGizmos()
