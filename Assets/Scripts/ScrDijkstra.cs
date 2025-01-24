@@ -11,6 +11,7 @@ public class ScrDijkstra
 
     private int _gridWidth;
     private int _gridHeight;
+    
     private int[,] _grid;
     private bool[,] _visited;
     private double[,] _distance;
@@ -24,7 +25,9 @@ public class ScrDijkstra
         _visited = new bool[_gridWidth, _gridHeight];
         _distance = new double[_gridWidth, _gridHeight];
         _previous = new int[_gridWidth, _gridHeight][];
-
+        _queue = new Queue<int>();
+        _path = new List<int[]>();
+        
         for (int y = 0; y < _gridHeight; y++)
         {
             for (int x = 0; x < _gridWidth; x++)
@@ -47,6 +50,9 @@ public class ScrDijkstra
     }
     public List<int[]> CalculatePath(int[] start, int[] goal)
     {
+        // Debug.Log("From: " + start[0] + ", " + start[1]);
+        // Debug.Log("To: " + goal[0] + ", " + goal[1]);
+        
         CreateGrid();
         _distance[start[0], start[1]] = 0;
         _queue.Enqueue(start[0] + start[1] * _gridWidth);
