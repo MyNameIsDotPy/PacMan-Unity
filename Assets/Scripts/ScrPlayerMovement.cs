@@ -77,7 +77,7 @@ public class ScrPlayerMovement : MonoBehaviour
             _t = 0;
             _initialPosition = gameObject.transform.position;
             _finalPosition = _initialPosition + _dir;
-            _childMesh.transform.rotation = Quaternion.LookRotation(-_dir, transform.up);
+            transform.rotation = Quaternion.LookRotation(-_dir, transform.up);
         }
 
         _t += Time.deltaTime * moveSpeed;
