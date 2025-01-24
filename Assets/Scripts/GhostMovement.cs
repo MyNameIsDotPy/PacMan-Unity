@@ -6,7 +6,8 @@ using UnityEngine.UIElements;
 
 public class GhostMovement : MonoBehaviour
 {
-    public Transform[] checkpoints;
+    public Transform checkpointsGroup;
+    public Transform[] _checkpoints;
     public float moveSpeed = 1;
     private float _t = 1;
     private Vector3 _initialPosition;
@@ -25,7 +26,8 @@ public class GhostMovement : MonoBehaviour
     
     void Start()
     {
-        transform.position = checkpoints[_currentCheckpoint].position;
+        _checkpoints = checkpointsGroup.GetComponentsInChildren<Transform>();
+        transform.position = _checkpoints[_currentCheckpoint].position;
         _initialPosition = transform.position;
         _finalPosition = transform.position;
         _dijkstra = new ScrDijkstra(15, 19);
@@ -42,13 +44,18 @@ public class GhostMovement : MonoBehaviour
     public void CalculatePathToCheckpoint(int index)
     {
         _start = new[] {Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.z) };
-        _goal = new[] {Mathf.RoundToInt(checkpoints[index].transform.position.x),Mathf.RoundToInt(checkpoints[index].transform.position.z)};
+        _goal = new[] {Mathf.RoundToInt(_checkpoints[index].transform.position.x),Mathf.RoundToInt(_checkpoints[index].transform.position.z)};
         _path = _dijkstra.CalculatePath(_start, _goal);
         _index = 0;
     }
 
     void Update()
     {
+    }
+
+    public Transform GetCheckpoint(int index)
+    {
+        return _checkpoints[index];
     }
 
     public void SetCheckpoint(int newIndex)
@@ -62,9 +69,9 @@ public class GhostMovement : MonoBehaviour
         int minIndex = 0;
         float minDistance = float.MaxValue;
         
-        for (int i = 0; i < checkpoints.Length; i++)
+        for (int i = 0; i < _checkpoints.Length; i++)
         {
-            Transform checkpoint = checkpoints[i];
+            Transform checkpoint = _checkpoints[i];
             float distance = Vector3.Distance(checkpoint.position, transform.position);
 
             if (distance < minDistance)
@@ -87,14 +94,13 @@ public class GhostMovement : MonoBehaviour
         
         if (_index < _path.Count)
         {
-            if (_t >= 1)
+            if (_t >= 1 && _index != _path.Count-1)
             {
                 _t = 0;
                 _initialPosition = new Vector3(_path[_index][0], 0, _path[_index][1]);
-                if (_index != _path.Count-1)
-                {
-                    _finalPosition = new Vector3(_path[_index+1][0], 0, _path[_index+1][1]);
-                }
+                
+                _finalPosition = new Vector3(_path[_index+1][0], 0, _path[_index+1][1]);
+                
                 _index++;
             }
             Debug.DrawRay(transform.position, _dir, Color.red);
@@ -108,9 +114,9 @@ public class GhostMovement : MonoBehaviour
     public void FollowCheckpoints()
     {
         
-        if (Vector3.Distance(transform.position, checkpoints[_currentCheckpoint].position) < 0.05f)
+        if (Vector3.Distance(transform.position, _checkpoints[_currentCheckpoint].position) < 0.05f)
         {
-            _currentCheckpoint = (_currentCheckpoint + 1)%checkpoints.Length;
+            _currentCheckpoint = (_currentCheckpoint + 1)%_checkpoints.Length;
             CalculatePathToCheckpoint(_currentCheckpoint);
         }
         FollowPath();
@@ -118,12 +124,6 @@ public class GhostMovement : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        for (int i = 0; i < checkpoints.Length; i++)
-        {
-            Vector3 dir = checkpoints[(i + 1)%checkpoints.Length].position - checkpoints[i].position;
-            Gizmos.DrawRay(checkpoints[i].position, dir);
-        }
-
         if (_path == null || _path.Count == 0)
         {
             return;
