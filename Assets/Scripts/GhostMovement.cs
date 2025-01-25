@@ -26,7 +26,13 @@ public class GhostMovement : MonoBehaviour
     
     void Start()
     {
-        _checkpoints = checkpointsGroup.GetComponentsInChildren<Transform>();
+        _checkpoints = new Transform[checkpointsGroup.childCount];
+        for (int i = 0; i < checkpointsGroup.childCount; i++)
+        {
+            _checkpoints[i] = checkpointsGroup.GetChild(i);
+        }
+        
+        Debug.Log(_checkpoints.Length);
         transform.position = _checkpoints[_currentCheckpoint].position;
         _initialPosition = transform.position;
         _finalPosition = transform.position;
