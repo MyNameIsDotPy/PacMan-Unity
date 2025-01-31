@@ -18,15 +18,19 @@ public class GhostMovement : MonoBehaviour
     
     private ScrDijkstra _dijkstra;
     
+    private Animator _animator;
+    
     // Chase player
     private int[] _start;
     private int[] _goal;
     private List<int[]> _path;
     private int _index;
+    private int[,] _grid;
     
     void Start()
     {
         _checkpoints = new Transform[checkpointsGroup.childCount];
+        _animator = GetComponent<Animator>();
         for (int i = 0; i < checkpointsGroup.childCount; i++)
         {
             _checkpoints[i] = checkpointsGroup.GetChild(i);
@@ -37,6 +41,7 @@ public class GhostMovement : MonoBehaviour
         _initialPosition = transform.position;
         _finalPosition = transform.position;
         _dijkstra = new ScrDijkstra(15, 19);
+        _grid = _dijkstra.GetGrid();
     }
 
     public void CalculatePathToPlayer()
@@ -57,6 +62,7 @@ public class GhostMovement : MonoBehaviour
 
     void Update()
     {
+        
     }
 
     public Transform GetCheckpoint(int index)
@@ -141,5 +147,25 @@ public class GhostMovement : MonoBehaviour
             Gizmos.DrawCube(newDir, Vector3.one/2);
         }
 
+        if (_grid != null)
+        {
+            for (int y = 0; y < _grid.GetLength(1); y++)
+            {
+                for (int x = 0; x < _grid.GetLength(0); x++)
+                {
+                    // Operador ternario
+                    Gizmos.color = _grid[x, y] == 0 ? Color.white : Color.red;
+                    Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one);
+                }
+            }
+        }
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            _animator.SetBool("isChasing", false);
+        }
     }
 }
