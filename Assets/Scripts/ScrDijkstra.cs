@@ -7,6 +7,7 @@ public class ScrDijkstra
     {
         _gridWidth = gridWidth;
         _gridHeight = gridHeight;
+        InitGrid();
     }
 
     private int _gridWidth;
@@ -18,10 +19,36 @@ public class ScrDijkstra
     private Queue<int> _queue = new Queue<int>();
     private List<int[]> _path = new List<int[]>();
     private int[,][] _previous;
-    
-    private void CreateGrid()
+
+    public int[,] GetGrid()
+    {
+        return _grid;
+    }
+
+    private void InitGrid()
     {
         _grid = new int[_gridWidth, _gridHeight];
+        for (int y = 0; y < _gridHeight; y++)
+        {
+            for (int x = 0; x < _gridWidth; x++)
+            {
+                Vector3 pos = new Vector3(x, -2, y);
+
+                if (Physics.Raycast(pos, Vector3.up, out RaycastHit hit, 5))
+                {
+                    _grid[x, y] = 0;
+                    if (hit.collider.CompareTag("Wall"))
+                    {
+                        _grid[x, y] = 1;
+                        Debug.Log(x + " " + y + " ");
+                    }
+                }
+            }
+        }
+    }
+
+    private void InitVariables()
+    {
         _visited = new bool[_gridWidth, _gridHeight];
         _distance = new double[_gridWidth, _gridHeight];
         _previous = new int[_gridWidth, _gridHeight][];
@@ -35,16 +62,6 @@ public class ScrDijkstra
                 _visited[x, y] = false;
                 _distance[x, y] = Mathf.Infinity;
                 _previous[x, y] = null;
-
-                Vector3 pos = new Vector3(x, -1, y);
-
-                if (Physics.Raycast(pos, Vector3.up, out RaycastHit hit, 2))
-                {
-                    if (hit.collider.CompareTag("Wall"))
-                    {
-                        _grid[x, y] = 1;
-                    }
-                }
             }
         }
     }
@@ -53,7 +70,7 @@ public class ScrDijkstra
         // Debug.Log("From: " + start[0] + ", " + start[1]);
         // Debug.Log("To: " + goal[0] + ", " + goal[1]);
         
-        CreateGrid();
+        InitVariables();
         _distance[start[0], start[1]] = 0;
         _queue.Enqueue(start[0] + start[1] * _gridWidth);
 
