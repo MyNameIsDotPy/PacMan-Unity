@@ -7,11 +7,17 @@ public class ScrPlayer : MonoBehaviour
 {
     private ScrPlayerMovement _scrPlayerMovement;
     private Animator _animator;
+    private AudioSource _audioSource;
+
+    public AudioClip coinClip;
+    public AudioClip deathClip;
+    
     public int vidas = 5;
     public int score = 0;
     public bool isDead = false;
     void Start()
     {
+        _audioSource = GetComponentInChildren<AudioSource>();
         _animator = GetComponentInChildren<Animator>();
         _scrPlayerMovement = GetComponent<ScrPlayerMovement>();
     }
@@ -32,12 +38,13 @@ public class ScrPlayer : MonoBehaviour
     public void KillPlayer()
     {
         isDead = true;
+        _audioSource.PlayOneShot(deathClip);
         _animator.SetBool("IsDead", isDead);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other.CompareTag("Enemy") && !isDead)
         {
             vidas --;
             KillPlayer();
@@ -49,6 +56,7 @@ public class ScrPlayer : MonoBehaviour
         if (other.gameObject.CompareTag("Pill"))
         {
             score++;
+            _audioSource.PlayOneShot(coinClip);
         }
     }
 }
