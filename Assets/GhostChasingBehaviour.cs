@@ -4,24 +4,20 @@ using UnityEngine;
 
 public class GhostChasingBehaviour : StateMachineBehaviour
 {
-    public float chasingPeriod;
-    private float _timer;
     private GhostMovement _ghostMovement;
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         _ghostMovement = animator.GetComponent<GhostMovement>();
-        _timer = chasingPeriod;
+        _ghostMovement.CalculatePathToPlayer();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        _timer += Time.deltaTime;
-        if (_timer >= chasingPeriod)
+        if (_ghostMovement.InEndOfPath())
         {
             _ghostMovement.CalculatePathToPlayer();
-            _timer = 0;
         }
         _ghostMovement.FollowPath();
     }
