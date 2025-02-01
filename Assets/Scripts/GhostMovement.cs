@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public class GhostMovement : MonoBehaviour
 {
     public Transform checkpointsGroup;
-    public Transform[] _checkpoints;
+    private Transform[] _checkpoints;
     public float moveSpeed = 1;
     private float _t = 1;
     private Vector3 _initialPosition;
@@ -36,7 +36,6 @@ public class GhostMovement : MonoBehaviour
             _checkpoints[i] = checkpointsGroup.GetChild(i);
         }
         
-        Debug.Log(_checkpoints.Length);
         transform.position = _checkpoints[_currentCheckpoint].position;
         _initialPosition = transform.position;
         _finalPosition = transform.position;
@@ -65,6 +64,11 @@ public class GhostMovement : MonoBehaviour
         
     }
 
+    public bool InEndOfPath()
+    {
+        return (_index >= _path.Count - 1 && _t >= 1);
+    }
+
     public Transform GetCheckpoint(int index)
     {
         return _checkpoints[index];
@@ -73,7 +77,6 @@ public class GhostMovement : MonoBehaviour
     public void SetCheckpoint(int newIndex)
     {
         _currentCheckpoint = newIndex;
-        _t = 0;
     }
 
     public int GetNearestCheckpoint()
@@ -109,7 +112,7 @@ public class GhostMovement : MonoBehaviour
             if (_t >= 1 && _index != _path.Count-1)
             {
                 _t = 0;
-                _initialPosition = new Vector3(_path[_index][0], 0, _path[_index][1]);
+                _initialPosition = transform.position;
                 
                 _finalPosition = new Vector3(_path[_index+1][0], 0, _path[_index+1][1]);
                 
@@ -126,7 +129,7 @@ public class GhostMovement : MonoBehaviour
     public void FollowCheckpoints()
     {
         
-        if (Vector3.Distance(transform.position, _checkpoints[_currentCheckpoint].position) < 0.05f)
+        if (Vector3.Distance(transform.position, _checkpoints[_currentCheckpoint].position) < 0.1f)
         {
             _currentCheckpoint = (_currentCheckpoint + 1)%_checkpoints.Length;
             CalculatePathToCheckpoint(_currentCheckpoint);
@@ -147,6 +150,7 @@ public class GhostMovement : MonoBehaviour
             Gizmos.DrawCube(newDir, Vector3.one/2);
         }
 
+        /*
         if (_grid != null)
         {
             for (int y = 0; y < _grid.GetLength(1); y++)
@@ -159,6 +163,7 @@ public class GhostMovement : MonoBehaviour
                 }
             }
         }
+        */
     }
 
     public void OnTriggerEnter(Collider other)
