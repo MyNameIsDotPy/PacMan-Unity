@@ -33,14 +33,15 @@ public class ScrDijkstra
             for (int x = 0; x < _gridWidth; x++)
             {
                 Vector3 pos = new Vector3(x, -2, y);
-
-                if (Physics.Raycast(pos, Vector3.up, out RaycastHit hit, 5))
+                
+                LayerMask mapMask = LayerMask.GetMask("Map");
+                
+                if (Physics.Raycast(pos, Vector3.up, out RaycastHit hit, 5, mapMask))
                 {
                     _grid[x, y] = 0;
                     if (hit.collider.CompareTag("Wall"))
                     {
                         _grid[x, y] = 1;
-                        Debug.Log(x + " " + y + " ");
                     }
                 }
             }
