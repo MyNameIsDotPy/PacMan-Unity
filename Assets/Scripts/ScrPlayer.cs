@@ -9,23 +9,43 @@ public class ScrPlayer : MonoBehaviour
     private Animator _animator;
     private AudioSource _audioSource;
 
+    [SerializeField]
+    private bool isSuper;
+    
     public AudioClip coinClip;
     public AudioClip deathClip;
     
     public int vidas = 5;
     public int score = 0;
     public bool isDead = false;
+    
+    [SerializeField]
+    private Renderer topRenderer;
+    private Material _material;
+    
+    
     void Start()
     {
         _audioSource = GetComponentInChildren<AudioSource>();
         _animator = GetComponentInChildren<Animator>();
         _scrPlayerMovement = GetComponent<ScrPlayerMovement>();
+        _material = topRenderer.sharedMaterial;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown("c"))
+        {
+            SetSuperPill(true);
+        }
+    }
+
+    public void SetSuperPill(bool superState)
+    {
+        isSuper = superState;
+        _animator.SetBool("IsSuper", superState);
+        _material.SetInt("_IsSuper", isSuper ? 1 : 0);
     }
 
     public void RevivePlayer()
@@ -44,7 +64,8 @@ public class ScrPlayer : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") && !isDead)
+        
+        if (other.CompareTag("Enemy") && !isDead && !isSuper)
         {
             vidas --;
             KillPlayer();
